@@ -1,7 +1,7 @@
 # Storm
 This is a PyTorch implementation of the paper: Towards Online Spatio-Temporal Data Prediction: A Knowledge Distillation Driven Continual Learning Approach (Storm)
 
-![framewwork](.\image\framework.png)
+![framewwork](./image/framework.png)
 
 
 ## Requirements
