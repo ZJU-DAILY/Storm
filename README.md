@@ -75,7 +75,9 @@ cd model/
 python train.py -d <dataset> -g <gpu_id>
 ```
 
-Our research code mainly refers to the following works:
+## Acknowledgement
+
+Our research code refers to the following works:
 
 [1] STG4Traffic：https://github.com/trainingl/STG4Traffic
 
