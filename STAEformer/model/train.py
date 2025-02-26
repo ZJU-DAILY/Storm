@@ -520,7 +520,7 @@ def test_model(model, testset_loader, log=None):
 
 
 if __name__ == "__main__":
-    mode = "fine"
+    mode = "mkd"
 
     # -------------------------- set running environment ------------------------- #
     parser = argparse.ArgumentParser()
@@ -697,7 +697,7 @@ if __name__ == "__main__":
 
 
     elif mode == "fine":
-        for index in range(2, 6):
+        for index in range(1, 6):
             seed_everything(42)
             print_log(f"fine {index}", log=log)
             trainset_loader, valset_loader, testset_loader, SCALER = get_dataloaders_from_index_data(
@@ -743,7 +743,7 @@ if __name__ == "__main__":
     elif mode == "mkd":
         for alpha in [0.01]:
             # for model_lambda in float_range(0.3, 0.7, 0.2):
-            for model_lambda in [0.55]:
+            for model_lambda in [0.58]:
                 for stu in [2]:
                     if stu == 2:
                         save_model = 1
@@ -799,8 +799,6 @@ if __name__ == "__main__":
                             verbose=1,
                             log=log,
                             save=save,
-
-
                         )
                         model.load_state_dict(torch.load(save))
                         test_model(model, testset_loader, log=log)

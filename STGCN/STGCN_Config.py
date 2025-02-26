@@ -11,14 +11,13 @@ DEVICE = 'cuda:0'
 MODEL = 'STGCN'
 
 
-DATASET = 'PEMSD8'
-GRAPH = "../data/PEMSD8/PEMSD8.csv"
-FILENAME_ID = None
-
-# DATASET = 'PEMSD4'
-# GRAPH = "../data/PEMSD4/PEMSD4.csv"
+# DATASET = 'PEMSD8'
+# GRAPH = "../data/PEMSD8/PEMSD8.csv"
 # FILENAME_ID = None
 
+DATASET = 'PEMSD4'
+GRAPH = "../data/PEMSD4/PEMSD4.csv"
+FILENAME_ID = None
 
 # 1. get configuration
 config_file = './{}_{}.conf'.format(DATASET, MODEL)

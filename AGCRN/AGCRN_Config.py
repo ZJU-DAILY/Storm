@@ -4,13 +4,12 @@ import configparser
 # MODE = 'train'
 MODE = 'mkd'
 DEBUG = False
-DEVICE = 'cuda:1'
+DEVICE = 'cuda:0'
 MODEL = 'AGCRN'
 
 DATASET = 'PEMSD4'
 GRAPH = "../data/PEMSD4/PEMSD4.csv"
 FILENAME_ID = None
-
 
 # DATASET = 'PEMSD8'
 # GRAPH = "../data/PEMSD8/PEMSD8.csv"

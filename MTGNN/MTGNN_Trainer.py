@@ -11,7 +11,6 @@ from lib.evaluate import All_Metrics
 from lib.utils import *
 from tqdm import tqdm
 from lib.evaluate import All_Metrics
-from lib.ST_aug_copy import *
 from lib.ST_aug import *
 from lib.data_loader import *
 
@@ -96,18 +95,19 @@ class Trainer(object):
 
             # print(dynamic_alpha)
             if dynamic_alpha > model_lambda:
-                aug_x = data.transpose(1, 3)
-                # aug_x = get_aug_data(adj_mx, data.transpose(1, 3))
-                # aug_adj_mx = get_aug_adj(adj_mx, data.transpose(1, 3))
-                #
-                # predefined_A = torch.tensor(aug_adj_mx) - torch.eye(self.args.num_node)
-                # predefined_A = predefined_A.to(self.args.device)
+                # aug_x = data.transpose(1, 3)
 
-                # tem_model = copy.deepcopy(self.model)
+                aug_x = get_aug_data(adj_mx, data.transpose(1, 3))
+                aug_adj_mx = get_aug_adj(adj_mx, data.transpose(1, 3))
 
-                # self.model.predefined_A = predefined_A
+                predefined_A = torch.tensor(aug_adj_mx) - torch.eye(self.args.num_node)
+                predefined_A = predefined_A.to(self.args.device)
 
-                aug_output = self.model(aug_x)
+                tem_model = copy.deepcopy(self.model)
+
+                tem_model.predefined_A = predefined_A
+
+                aug_output = tem_model(aug_x)
                 aug_teacher_model_output = teacher_model(aug_x)
 
                 loss = self.loss(aug_output.cuda(), aug_teacher_model_output.cuda())
@@ -215,7 +215,7 @@ class Trainer(object):
         self.model.load_state_dict(best_model)
         self.test(self.model, self.args, self.test_loader, self.scaler, self.logger)
 
-    def mkd_train(self, teacher_model, alpha, model_lambda, adj_mx, stu):
+    def mkd_train(self, teacher_model, alpha, model_lambda, adj_mx, stu, save_model=1):
         best_model = None
         best_loss = float('inf')
         not_improved_count = 0
@@ -316,12 +316,13 @@ class Trainer(object):
             if best_state == True:
                 # self.logger.info("Current best model saved!")
                 best_model = copy.deepcopy(self.model.state_dict())
-                # teacher_parameters = copy.deepcopy(teacher_model.state_dict())
-                # for key in best_model:
-                #     # mask 不参与更新
-                #     if 'mask' in key:
-                #         continue
-                #     best_model[key] = (best_model[key] + teacher_parameters[key]) / 2
+                if save_model == 1:
+                    teacher_parameters = copy.deepcopy(teacher_model.state_dict())
+                    for key in best_model:
+                        # mask 不参与更新
+                        if 'mask' in key:
+                            continue
+                        best_model[key] = (best_model[key] + teacher_parameters[key]) / 2
 
                 torch.save(best_model, self.best_path)
 

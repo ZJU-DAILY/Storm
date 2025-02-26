@@ -201,7 +201,7 @@ class Trainer(object):
         train_time = []
         inference_time = []
         # 构建KD树
-        build_kd_tree(adj_mx)
+        build_kd_tree(adj_mx.cpu())
         for epoch in tqdm(range(1, self.args.epochs + 1)):
             if self.freeze is True and epoch % 10 == 0:
                 # 获取 SynFlow 得分

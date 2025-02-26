@@ -24,16 +24,31 @@ def get_aug_adj(adj, x):
     # set_env
     # 将邻接矩阵保存为txt文件
     adj_matrix_sparse = adj
-    seed = random.randint(0, 3)
+    seed = random.randint(0, 2)
     if seed == 0:
         adj_matrix_sparse = aug_drop_node(adj, x, 0.1)
     elif seed == 1:
         adj_matrix_sparse = aug_drop_edges(adj, x, 0.1)
     elif seed == 2:
         adj_matrix_sparse = aug_add_edges_with_existing_weights(adj, x, 0.2)
-        # adj_matrix_sparse = aug_add_edges(adj, 0.2)
 
     return adj_matrix_sparse
+
+
+
+# 定义数据增强函数
+def get_aug_data(adj, x):
+    seed = random.randint(0, 2)
+    x_aug = x
+    if seed == 0:
+        x_aug = time_noise(adj, x)
+    elif seed == 1:
+        x_aug = time_shift(x, 1)
+    elif seed == 2:
+        x_aug = time_reversal(x)
+
+
+    return x_aug
 
 
 # 全局变量
@@ -52,7 +67,7 @@ def build_kd_tree(adj):
     # 使用MDS将邻接矩阵（距离矩阵）转化为节点的二维坐标
     mds = MDS(n_components=2, dissimilarity='precomputed', random_state=0)
     # symmetrize_adj = adj
-    symmetrize_adj = adj.cpu()
+    symmetrize_adj = adj
     symmetrize_adj = (symmetrize_adj + symmetrize_adj.T) / 2
     node_positions = mds.fit_transform(symmetrize_adj)
 
@@ -127,19 +142,6 @@ def time_shift(x, shift):
 def time_reversal(x):
     return torch.flip(x, dims=[1])
 
-
-# 定义数据增强函数
-def get_aug_data(adj, x):
-    seed = random.randint(0, 3)
-    x_aug = x
-    if seed == 0:
-        x_aug = time_noise(adj, x)
-    elif seed == 1:
-        x_aug = time_shift(x, 1)
-    elif seed == 2:
-        x_aug = time_reversal(x)
-
-    return x_aug
 
 
 def calculate_time_correlation(time_series):

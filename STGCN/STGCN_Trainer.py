@@ -13,59 +13,11 @@ from lib.data_loader import *
 from lib.ST_aug_copy import *
 from lib.ST_aug import *
 from lib.data_loader import *
-from light.pruners import load_pruner
-from light import generator
-from light import do_prune
-import light.metric
 from STGCN_Utils import *
 
 import copy
-prune_x = []
-prune_y = []
-print_prune = 1
 
 
-def prune_model_epoch(args, model, trainer, compress):
-    global print_prune
-    if float(compress) == 1.0:
-        return
-
-    data_x = torch.cat(prune_x, axis=-1)
-    data_y = torch.cat(prune_y, axis=-1)
-
-    data_x = data_x.cpu().numpy()
-    data_y = data_y.cpu().numpy()
-
-    # 创建一个新的 DataLoader 对象，这就是你的 prune_loader
-    prune_loader = data_loader(data_x, data_y, batch_size=args.batch_size)
-
-    pruner = load_pruner(args.pruner)(
-        generator.masked_parameters(model, args.prune_bias, args.prune_batchnorm, args.prune_residual,
-                                    args.prune_layernorm))
-
-    sparsity = compress
-
-    do_prune.prune_loop(model, trainer.loss, pruner, prune_loader, args.device, sparsity,
-                        args.compression_schedule, args.mask_scope, args.prune_epochs, trainer.scaler,
-                        args.reinitialize,
-                        args.prune_train_mode,
-                        args.shuffle, args.invert)
-
-    prune_result = light.metric.summary(model,
-                                        pruner.scores,
-                                        light.metric.flop(model, [], args.device),
-                                        lambda p: generator.prunable(p, args.prune_batchnorm, args.prune_residual,
-                                                                     args.prune_layernorm))
-
-    total_params = int((prune_result['sparsity'] * prune_result['size']).sum())
-    possible_params = prune_result['size'].sum()
-    # total_flops = int((prune_result['sparsity'] * prune_result['flops']).sum())
-    # possible_flops = prune_result['flops'].sum()
-    if print_prune == 1:
-        trainer.logger.info(
-            "Parameter Sparsity: {}/{} ({:.4f})".format(total_params, possible_params, total_params / possible_params))
-        print_prune = 0
-    # trainer.logger.info("FLOP Sparsity: {}/{} ({:.4f})".format(total_flops, possible_flops, total_flops / possible_flops))
 
 
 
@@ -357,7 +309,7 @@ class Trainer(object):
         train_time = []
         inference_time = []
         # 构建KD树
-        build_kd_tree(adj_mx)
+        build_kd_tree(adj_mx.cpu())
         for epoch in tqdm(range(1, self.args.epochs + 1)):
             if self.freeze is True and epoch % 10 == 0 :
                 # 获取 SynFlow 得分

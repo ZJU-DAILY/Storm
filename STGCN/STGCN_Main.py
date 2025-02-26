@@ -122,53 +122,6 @@ def float_range(start, stop, step):
         start += step
 
 
-def prune_model(args, model, trainer, compress):
-    if float(compress) == 1.0:
-        return
-    dataloader = trainer.data_loader
-
-    prune_x = []
-    prune_y = []
-    for i, (data, target, _) in enumerate(dataloader['train_loader'].get_iterator()):
-        prune_x.append(data)
-        prune_y.append(target)
-        if i + 1 >= args.prune_dataset_ratio:
-            break
-
-    data_x = np.concatenate(prune_x, axis=-1)
-    data_y = np.concatenate(prune_y, axis=-1)
-
-    # 创建一个新的 DataLoader 对象，这就是你的 prune_loader
-    prune_loader = DataLoaderM(data_x, data_y, data_x, batch_size=dataloader['train_loader'].batch_size)
-
-    pruner = load_pruner(args.pruner)(
-        generator.masked_parameters(model, args.prune_bias, args.prune_batchnorm, args.prune_residual,
-                                    args.prune_layernorm))
-
-    sparsity = compress
-
-    do_prune.prune_loop(model, trainer.loss, pruner, prune_loader, args.device, sparsity,
-                        args.compression_schedule, args.mask_scope, args.prune_epochs, scaler, args.reinitialize,
-                        args.prune_train_mode,
-                        args.shuffle, args.invert)
-
-    prune_result = light.metric.summary(model,
-                                        pruner.scores,
-                                        light.metric.flop(model, [], args.device),
-                                        lambda p: generator.prunable(p, args.prune_batchnorm, args.prune_residual,
-                                                                     args.prune_layernorm))
-
-    total_params = int((prune_result['sparsity'] * prune_result['size']).sum())
-    possible_params = prune_result['size'].sum()
-    # total_flops = int((prune_result['sparsity'] * prune_result['flops']).sum())
-    # possible_flops = prune_result['flops'].sum()
-
-    trainer.logger.info(
-        "Parameter Sparsity: {}/{} ({:.4f})".format(total_params, possible_params, total_params / possible_params))
-    # trainer.logger.info("FLOP Sparsity: {}/{} ({:.4f})".format(total_flops, possible_flops, total_flops / possible_flops))
-
-
-
 
 if __name__ == '__main__':
     if torch.cuda.is_available():
@@ -247,7 +200,7 @@ if __name__ == '__main__':
             # trainer.test(model, args, test_dataloader, scaler, trainer.logger, save_path=save_model_dir)
     elif args.mode == "mkd":
 
-        for alpha in [0.1]:
+        for alpha in [0.01]:
             # for model_lambda in float_range(0.3, 0.7, 0.2):
             for model_lambda in [0.55]:
             # for model_lambda in float_range(0.3, 0.7, 0.2):

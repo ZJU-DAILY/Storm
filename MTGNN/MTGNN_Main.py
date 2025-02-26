@@ -221,7 +221,7 @@ if __name__ == '__main__':
             adj_mx, train_dataloader, val_dataloader, test_dataloader, scaler = load_data( args, index)
             trainer.test(model, args, test_dataloader, scaler, trainer.logger, save_path=save_model_dir)
     elif args.mode == "fine":
-        for index in range(2, 3):
+        for index in range(2, 6):
             adj_mx, train_dataloader, val_dataloader, test_dataloader, scaler = load_data( args, index)
 
             model, loss, optimizer, lr_scheduler = generate_model_components(args)
@@ -249,7 +249,6 @@ if __name__ == '__main__':
 
             trainer.logger.info(f"{index} ")
 
-
             save_model_dir = os.path.join(model_dir, f"fine_test_{index}.pth")
             trainer.best_path = save_model_dir
 
@@ -258,7 +257,7 @@ if __name__ == '__main__':
     elif args.mode == "mkd":
         for alpha in [0.01]:
             # for model_lambda in float_range(0.3, 0.7, 0.2):
-            for model_lambda in [0.6]:
+            for model_lambda in [0.57]:
                 for stu in [2]:
                     for compress in [1]:
                         # for prune in ['rand', 'mag', 'snip', 'grasp', 'synflow']:
@@ -299,6 +298,8 @@ if __name__ == '__main__':
                                 lr_scheduler=lr_scheduler,
                                 freeze=True
                             )
+
+                            trainer.logger.info("w/o  time_noise ")
 
                             trainer.logger.info(f"{index} {alpha} {model_lambda} {compress} {stu} ")
                             prune_model(args, model, trainer, compress)

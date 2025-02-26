@@ -139,7 +139,7 @@ if __name__ == '__main__':
             adj_mx, train_dataloader, val_dataloader, test_dataloader, scaler = load_data( args, index)
             trainer.test(model, args, test_dataloader, scaler, trainer.logger, save_path=save_model_dir)
     elif args.mode == "fine":
-        for index in range(2, 3):
+        for index in range(2, 6):
             adj_mx, train_dataloader, val_dataloader, test_dataloader, scaler = load_data( args, index)
 
             model, loss, optimizer, lr_scheduler = generate_model_components(args)
@@ -174,7 +174,7 @@ if __name__ == '__main__':
             # trainer.test(model, args, test_dataloader, scaler, trainer.logger, save_path=save_model_dir)
     elif args.mode == "mkd":
         for alpha in [0.01]:
-            for model_lambda in [0.6]:
+            for model_lambda in [0.58]:
                 for stu in [2]:
                     if stu == 2:
                         save_model = 1

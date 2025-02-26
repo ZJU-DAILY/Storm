@@ -8,10 +8,6 @@ DEVICE = 'cuda:1'
 MODEL = 'MTGNN'
 
 
-import torch
-
-
-
 # DATASET = 'PEMSD8'
 # GRAPH = "../data/PEMSD8/PEMSD8.csv"
 # FILENAME_ID = None
