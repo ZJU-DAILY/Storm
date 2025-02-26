@@ -5,7 +5,7 @@ This is a PyTorch implementation of the paper: Towards Online Spatio-Temporal Da
 
 
 ## Requirements & Configuration
-The model is implemented using Python3 with dependencies specified in requirements.txt, and configuration.txt indicates the conda version and Python version used.
+The model is implemented using Python3 with dependencies specified in requirements.txt, and configuration.txt indicates the Conda version and Python version used.
 
 ```
 pip install -r requirements.txt
